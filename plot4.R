@@ -6,16 +6,18 @@ unzip("./data/NEI_data.zip")
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
-#  Create Data
-SCC.coal = SCC[grepl("coal", SCC$Short.Name, ignore.case=TRUE),]
+# Select emissions from coal combustion-related sources from "Short.Name" colomn
+Coal <- unique(grep("coal",SCC$Short.Name,ignore.case=TRUE,value=TRUE))
+SCCC <- SCC[SCC$Short.Name %in% Coal,]["SCC"]
+
 
 # Merge two data sets
-DT <- merge(x=NEI, y=SCC.coal, by='SCC')
-DT4 <- aggregate(DT[, 'Emissions'], by=list(merge$year), sum)
+DT <- merge(x=NEI, y=SCCC, by='SCC')
+DT4 <- aggregate(DT[, 'Emissions'], by=list(DT$year), sum)
 colnames(DT4) <- c('Year', 'Emissions')
+head(DT4)
 
-# In the United States, emissions from coal combustion-related sources through 1999-2008?
-
+# In the United States, emissions from coal combustion-related sources through 1999-2008
 # Create Plot
 png("plot4.png",width=480,height=480)
 
